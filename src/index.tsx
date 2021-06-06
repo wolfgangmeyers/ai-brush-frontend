@@ -12,6 +12,10 @@ import {
   Route,
 } from "react-router-dom";
 import { Authentication } from './Authentication';
+import { ListJobs } from './ListJobs';
+
+import "./index.css"
+import { JobDetails } from './JobDetails';
 
 const App: FC = () => {
 
@@ -19,8 +23,14 @@ const App: FC = () => {
     <Router>
       <Authentication>
         <Switch>
-          <Route path="/">
+          <Route path="/" exact={true}>
             <Generate />
+          </Route>
+          <Route path="/jobs" exact={true}>
+            <ListJobs />
+          </Route>
+          <Route path="/jobs/:job">
+            <JobDetails />
           </Route>
         </Switch>
       </Authentication>
