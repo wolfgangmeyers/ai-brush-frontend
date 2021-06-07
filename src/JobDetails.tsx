@@ -14,10 +14,23 @@ export const JobDetails: FC = () => {
     async function init() {
         const resp = await client.getJob(params.job)
         setJob(resp.data)
+        await refresh()
+    }
+
+    async function refresh() {
         const resultIdsResp = await client.listJobResults(params.job)
         if (resultIdsResp.data.results) {
             const resultsResp = await Promise.all(resultIdsResp.data.results.map(item => client.getJobResult(item.id as string)))
             setResults(resultsResp.map(resp => resp.data as JobResult))
+        }
+    }
+
+    async function fetchLatest() {
+        const maxCreated = Math.max(...results.map(r => r.created as number))
+        const resultIdsResp = await client.listJobResults(params.job, maxCreated, "forward")
+        if (resultIdsResp.data.results) {
+            const resultsResp = await Promise.all(resultIdsResp.data.results.map(item => client.getJobResult(item.id as string)))
+            setResults(results => [...resultsResp.map(resp => resp.data as JobResult), ...results])
         }
     }
 
@@ -33,11 +46,12 @@ export const JobDetails: FC = () => {
             <div style={{ padding: "50px" }}>
                 Label: {job.label}
                 <br />
-                <button>Refresh</button>
+                <button onClick={() => refresh()}>Refresh all</button>
+                <button onClick={() => fetchLatest()}>Fetch latest</button>
                 <hr/>
                 {results.map(result => (
                     <div key={result.id} style={{margin: "10px", float: "left", border: "1px solid black", padding: "5px"}}>
-                        <img src={`data:image/png;base64,${result.encoded_image}`}></img>
+                        <img style={{width: "200px"}} src={`data:image/png;base64,${result.encoded_image}`}></img>
                     </div>
                 ))}
             </div>
