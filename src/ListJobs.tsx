@@ -16,6 +16,19 @@ export const ListJobs: FC = props => {
         }
     }
 
+    async function onDelete(jobId: string) {
+        await client.deleteJob(jobId)
+        if (jobs) {
+            const idx = jobs.findIndex(j => j.id === jobId)
+            if (idx !== undefined && idx >= 0) {
+                setJobs([
+                    ...jobs.slice(0, idx),
+                    ...jobs.slice(idx + 1),
+                ])
+            }
+        }
+    }
+
     useEffect(() => {
         if (!jobs) {
             setJobs([])
@@ -32,6 +45,7 @@ export const ListJobs: FC = props => {
                         <th>Label</th>
                         <th>Count</th>
                         <th>Iterations</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -45,6 +59,9 @@ export const ListJobs: FC = props => {
                             <td>{job.label}</td>
                             <td>{job.count}</td>
                             <td>{job.iterations}</td>
+                            <td>
+                                <button onClick={() => onDelete(job.id as string)}>Delete</button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>

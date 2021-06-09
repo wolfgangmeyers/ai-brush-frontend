@@ -16,6 +16,7 @@ import { ListJobs } from './ListJobs';
 
 import "./index.css"
 import { JobDetails } from './JobDetails';
+import { JobResultDetails } from './JobResultDetails';
 
 const App: FC = () => {
 
@@ -31,6 +32,9 @@ const App: FC = () => {
           </Route>
           <Route path="/jobs/:job">
             <JobDetails />
+          </Route>
+          <Route path="/job-results/:result">
+            <JobResultDetails />
           </Route>
         </Switch>
       </Authentication>
