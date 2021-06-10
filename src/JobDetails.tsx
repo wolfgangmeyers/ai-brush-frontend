@@ -16,11 +16,16 @@ export const JobDetails: FC = () => {
     const history = useHistory()
 
     async function loadParent(parentId: string) {
-        const cachedParent = lscache.get(parentId)
+        const cachedParent = lscache.get(parentId + "_thumbnail")
         if (cachedParent) {
             setParent(cachedParent)
         } else {
-            const parentResp = await client.getImage(parentId)
+            const parentResp = await client.getImage(parentId, {
+                params: {
+                    download: "thumbnail"
+                }
+            })
+            lscache.set(parentId + "_thumbnail", parentResp.data)
             setParent(parentResp.data)
         }
     }
