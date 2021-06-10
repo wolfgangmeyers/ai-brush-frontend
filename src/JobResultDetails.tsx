@@ -13,13 +13,17 @@ export const JobResultDetails: FC = () => {
     const [jobResult, setJobResult] = useState<JobResult | undefined>(undefined)
 
     async function init() {
-        const cachedResult = lscache.get(params.result)
+        const cachedResult = lscache.get(params.result + "_image")
         if (cachedResult) {
             setJobResult(cachedResult)
             return
         }
-        const resp = await client.getJobResult(params.result)
-        lscache.set(params.result, resp.data)
+        const resp = await client.getJobResult(params.result, {
+            params: {
+                download: "image"
+            }
+        })
+        lscache.set(params.result + "_image", resp.data)
         setJobResult(resp.data)
     }
 
@@ -52,7 +56,7 @@ export const JobResultDetails: FC = () => {
             <button onClick={() => onSaveAndFork()}>Save and fork</button>
             <hr/>
             {jobResult && (
-                <img style={{width: "512px"}} src={`data:image/png;base64,${jobResult.encoded_image}`}></img>
+                <img style={{width: "512px"}} src={`data:image/jpeg;base64,${jobResult.encoded_image}`}></img>
             )}
         </div>
     )

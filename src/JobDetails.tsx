@@ -51,7 +51,7 @@ export const JobDetails: FC = () => {
             const uncachedResults: Array<JobResult> = []
             const cachedResults: Array<JobResult> = []
             resultIdsResp.data.results.forEach(item => {
-                let cachedResult = lscache.get(item.id as string)
+                let cachedResult = lscache.get(item.id + "_thumbnail")
                 if (cachedResult) {
                     cachedResults.push(cachedResult)
                 } else {
@@ -60,11 +60,15 @@ export const JobDetails: FC = () => {
             })
             const resultsResp = await Promise.all(
                 uncachedResults.map(
-                    item => client.getJobResult(item.id as string)
+                    item => client.getJobResult(item.id as string, {
+                        params: {
+                            download: "thumbnail"
+                        }
+                    })
                 )
             )
             for (let item of resultsResp) {
-                lscache.set(item.data.id as string, item.data)
+                lscache.set(item.data.id + "_thumbnail", item.data)
             }
             const results = [
                 ...resultsResp.map(resp => resp.data as JobResult),
@@ -85,7 +89,7 @@ export const JobDetails: FC = () => {
         if (resultIdsResp.data.results) {
             const resultsResp = await Promise.all(resultIdsResp.data.results.map(item => client.getJobResult(item.id as string)))
             for (let item of resultsResp) {
-                lscache.set(item.data.id as string, item.data)
+                lscache.set(item.data.id + "_thumbnail", item.data)
             }
             setResults(results => [...resultsResp.map(resp => resp.data as JobResult), ...results])
         }
@@ -117,7 +121,7 @@ export const JobDetails: FC = () => {
                 <hr/>
                 {results.map(result => (
                     <div key={result.id} style={{margin: "10px", float: "left", border: "1px solid black", padding: "5px"}}>
-                        <img onClick={() => history.push(`/job-results/${result.id}`)} style={{width: "200px", cursor: "pointer"}} src={`data:image/png;base64,${result.encoded_image}`}></img>
+                        <img onClick={() => history.push(`/job-results/${result.id}`)} style={{width: "200px", cursor: "pointer"}} src={`data:image/jpeg;base64,${result.encoded_image}`}></img>
                     </div>
                 ))}
             </div>
