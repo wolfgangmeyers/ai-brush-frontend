@@ -11,6 +11,7 @@
         "@types/react": "^17.0.0",
         "@types/react-dom": "^17.0.0",
         "lscache": "^1.3.0",
+        "moment": "^2.29.1",
         "qs": "^6.10.1",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
@@ -24,7 +25,7 @@
         "build": "react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
-        "genclient": "openapi-generator-cli generate -g typescript-axios -i https://qb1eyw689j.execute-api.us-east-1.amazonaws.com/Prod/openapi.yaml -o src/client"
+        "genclient": "openapi-generator-cli generate -g typescript-axios -i https://qb1eyw689j.execute-api.us-east-1.amazonaws.com/Prod/openapi.yaml -o src/generated-client"
     },
     "eslintConfig": {
         "extends": [

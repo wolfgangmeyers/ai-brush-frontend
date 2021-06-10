@@ -13,18 +13,18 @@ export const JobResultDetails: FC = () => {
     const [jobResult, setJobResult] = useState<JobResult | undefined>(undefined)
 
     async function init() {
-        const cachedResult = lscache.get(params.result + "_image")
+        const cachedResult = lscache.get("results/" + params.result + "_image")
         if (cachedResult) {
             setJobResult(cachedResult)
             return
         }
-        const resp = await client.getJobResult(params.result, {
-            params: {
-                download: "image"
-            }
-        })
-        lscache.set(params.result + "_image", resp.data)
+        const resp = await client.getJobResult(params.result, "image")
+        lscache.set("results/" + params.result + "_image", resp.data)
         setJobResult(resp.data)
+    }
+
+    function onCancel() {
+        history.push(`/jobs/${jobResult?.job_id}`)
     }
 
     async function onDelete() {
@@ -49,8 +49,8 @@ export const JobResultDetails: FC = () => {
     }, [jobResult, params.result])
 
     return (
-        <div>
-            <button>Cancel</button>
+        <div style={{ padding: "50px" }}>
+            <button onClick={() => onCancel()}>Cancel</button>
             <button onClick={() => onDelete()}>Delete</button>
             <button onClick={() => onSave()}>Save</button>
             <button onClick={() => onSaveAndFork()}>Save and fork</button>

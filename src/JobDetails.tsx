@@ -16,22 +16,21 @@ export const JobDetails: FC = () => {
     const history = useHistory()
 
     async function loadParent(parentId: string) {
-        const cachedParent = lscache.get(parentId + "_thumbnail")
+        console.log("loadParent")
+        const cachedParent = lscache.get("results/" + parentId + "_thumbnail")
         if (cachedParent) {
+            console.log("cached", cachedParent)
             setParent(cachedParent)
         } else {
-            const parentResp = await client.getImage(parentId, {
-                params: {
-                    download: "thumbnail"
-                }
-            })
-            lscache.set(parentId + "_thumbnail", parentResp.data)
+            console.log("Loading parent")
+            const parentResp = await client.getImage(parentId, "thumbnail")
+            lscache.set("results/" + parentId + "_thumbnail", parentResp.data)
             setParent(parentResp.data)
         }
     }
 
     async function init() {
-        let cached = lscache.get(params.job)
+        let cached = lscache.get("results/" + params.job)
         if (cached) {
             const job = cached as Job
             setJob(job)
@@ -42,7 +41,7 @@ export const JobDetails: FC = () => {
             return
         }
         const resp = await client.getJob(params.job)
-        lscache.set(params.job as string, resp.data)
+        lscache.set("results/" + params.job as string, resp.data)
         setJob(resp.data)
         if (resp.data.parent) {
             await loadParent(resp.data.parent)
@@ -56,7 +55,7 @@ export const JobDetails: FC = () => {
             const uncachedResults: Array<JobResult> = []
             const cachedResults: Array<JobResult> = []
             resultIdsResp.data.results.forEach(item => {
-                let cachedResult = lscache.get(item.id + "_thumbnail")
+                let cachedResult = lscache.get("results/" + item.id + "_thumbnail")
                 if (cachedResult) {
                     cachedResults.push(cachedResult)
                 } else {
@@ -65,15 +64,11 @@ export const JobDetails: FC = () => {
             })
             const resultsResp = await Promise.all(
                 uncachedResults.map(
-                    item => client.getJobResult(item.id as string, {
-                        params: {
-                            download: "thumbnail"
-                        }
-                    })
+                    item => client.getJobResult(item.id as string, "thumbnail")
                 )
             )
             for (let item of resultsResp) {
-                lscache.set(item.data.id + "_thumbnail", item.data)
+                lscache.set("results/" + item.data.id + "_thumbnail", item.data)
             }
             const results = [
                 ...resultsResp.map(resp => resp.data as JobResult),
@@ -94,7 +89,7 @@ export const JobDetails: FC = () => {
         if (resultIdsResp.data.results) {
             const resultsResp = await Promise.all(resultIdsResp.data.results.map(item => client.getJobResult(item.id as string)))
             for (let item of resultsResp) {
-                lscache.set(item.data.id + "_thumbnail", item.data)
+                lscache.set("results/" + item.data.id + "_thumbnail", item.data)
             }
             setResults(results => [...resultsResp.map(resp => resp.data as JobResult), ...results])
         }
@@ -104,6 +99,10 @@ export const JobDetails: FC = () => {
         if (!job || job.id !== params.job) {
             init()
         }
+        const handle = setInterval(() => {
+            fetchLatest()
+        }, 10000)
+        return () => clearInterval(handle)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params.job, job])
 
@@ -119,14 +118,14 @@ export const JobDetails: FC = () => {
                 Count: {job.count}
                 <br/>
                 {parent && <div style={{margin: "10px", border: "1px solid black", padding: "5px"}}>
-                        Parent: <img style={{width: "200px", cursor: "pointer"}} src={`data:image/png;base64,${parent.encoded_image}`}></img>
+                        Parent: <img style={{width: "200px", cursor: "pointer"}} src={`data:image/jpeg;base64,${parent.encoded_thumbnail}`}></img>
                     </div>}
                 <button onClick={() => refresh()}>Refresh all</button>
                 <button onClick={() => fetchLatest()}>Fetch latest</button>
                 <hr/>
                 {results.map(result => (
                     <div key={result.id} style={{margin: "10px", float: "left", border: "1px solid black", padding: "5px"}}>
-                        <img onClick={() => history.push(`/job-results/${result.id}`)} style={{width: "200px", cursor: "pointer"}} src={`data:image/jpeg;base64,${result.encoded_image}`}></img>
+                        <img onClick={() => history.push(`/job-results/${result.id}`)} style={{width: "200px", cursor: "pointer"}} src={`data:image/jpeg;base64,${result.encoded_thumbnail}`}></img>
                     </div>
                 ))}
             </div>

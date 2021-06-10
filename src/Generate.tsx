@@ -42,7 +42,7 @@ export const Generate: FC = () => {
   async function updateParent(parentId: string) {
     setParent(parentId)
     // try to load from cache
-    const cachedParent = lscache.get(parentId)
+    const cachedParent = lscache.get("results/" + parentId)
     if (cachedParent) {
       setPhrases(cachedParent.phrases)
       return

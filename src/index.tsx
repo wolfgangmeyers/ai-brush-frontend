@@ -17,6 +17,8 @@ import { ListJobs } from './ListJobs';
 import "./index.css"
 import { JobDetails } from './JobDetails';
 import { JobResultDetails } from './JobResultDetails';
+import { Images } from './Images';
+import { ImageDetails } from './ImageDetails';
 
 const App: FC = () => {
 
@@ -36,6 +38,13 @@ const App: FC = () => {
           <Route path="/job-results/:result">
             <JobResultDetails />
           </Route>
+          <Route path="/images" exact={true}>
+            <Images />
+          </Route>
+          <Route path="/images/:image" exact={true}>
+            <ImageDetails />
+          </Route>
+
         </Switch>
       </Authentication>
     </Router>
