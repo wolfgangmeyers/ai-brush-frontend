@@ -74,15 +74,17 @@ export const JobDetails: FC = () => {
                 ...resultsResp.map(resp => resp.data as JobResult),
                 ...cachedResults
             ]
-            results.sort((a, b) => (a.created as number) - (b.created as number))
+            results.sort((a, b) => (a.score as number) - (b.score as number))
 
             setResults(results)
         }
     }
 
     async function fetchLatest() {
+
         if (results.length === 0) {
             refresh()
+            return
         }
         const maxCreated = Math.max(...results.map(r => r.created as number))
         const resultIdsResp = await client.listJobResults(params.job, maxCreated, "forward")
@@ -118,14 +120,16 @@ export const JobDetails: FC = () => {
                 Count: {job.count}
                 <br/>
                 {parent && <div style={{margin: "10px", border: "1px solid black", padding: "5px"}}>
-                        Parent: <img style={{width: "200px", cursor: "pointer"}} src={`data:image/jpeg;base64,${parent.encoded_thumbnail}`}></img>
+                        Parent: <img style={{width: "256px", cursor: "pointer"}} src={`data:image/jpeg;base64,${parent.encoded_thumbnail}`}></img>
                     </div>}
                 <button onClick={() => refresh()}>Refresh all</button>
                 <button onClick={() => fetchLatest()}>Fetch latest</button>
                 <hr/>
                 {results.map(result => (
                     <div key={result.id} style={{margin: "10px", float: "left", border: "1px solid black", padding: "5px"}}>
-                        <img onClick={() => history.push(`/job-results/${result.id}`)} style={{width: "200px", cursor: "pointer"}} src={`data:image/jpeg;base64,${result.encoded_thumbnail}`}></img>
+                        <img onClick={() => history.push(`/job-results/${result.id}`)} style={{width: "256px", cursor: "pointer"}} src={`data:image/jpeg;base64,${result.encoded_thumbnail}`}></img>
+                        <br/>
+                        Score: {result.score}
                     </div>
                 ))}
             </div>

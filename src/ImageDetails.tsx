@@ -32,6 +32,10 @@ export const ImageDetails: FC = () => {
         history.push("/images")
     }
 
+    async function onFork() {
+        history.push(`/?parent=${image?.id}`)
+    }
+
     useEffect(() => {
         if (!image || image.id !== params.image) {
             init()
@@ -40,6 +44,7 @@ export const ImageDetails: FC = () => {
 
     return (
         <div style={{ padding: "50px" }}>
+            <button onClick={() => onFork()}>Fork</button>
             <button onClick={() => onCancel()}>Cancel</button>
             <button onClick={() => onDelete()}>Delete</button>
             {/*

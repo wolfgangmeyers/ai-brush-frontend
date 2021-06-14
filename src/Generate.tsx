@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from "react"
 import { useHistory } from "react-router-dom"
 import qs from "qs"
-import lscache from "lscache"
+import lscache, { set } from "lscache"
 
 import { getClient } from "./client"
 
@@ -15,6 +15,7 @@ export const Generate: FC = () => {
   const [count, setCount] = useState(1)
   const [label, setLabel] = useState("")
   const [parent, setParent] = useState<string | undefined>(undefined)
+  const [lr, setLr] = useState(0.06)
 
   const searchParams = qs.parse(window.location.search.substring(1)) as any
 
@@ -78,6 +79,8 @@ export const Generate: FC = () => {
       <br /><br />
       <label>Count:</label>&nbsp;
       <input min={1} max={100} style={{ width: "50px" }} type="number" value={count} onChange={e => setCount(parseInt(e.target.value))} />
+      <br /><br />
+      <input min={0.01} max={0.2} step={0.01} style={{ width: "50px" }} type="number" value={lr} onChange={e => setLr(parseFloat(e.target.value))} />
       <br /><br />
       <label>Parent:</label>&nbsp;{parent || ""}
       <br/><br/>

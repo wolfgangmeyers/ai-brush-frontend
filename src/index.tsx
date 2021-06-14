@@ -19,12 +19,14 @@ import { JobDetails } from './JobDetails';
 import { JobResultDetails } from './JobResultDetails';
 import { Images } from './Images';
 import { ImageDetails } from './ImageDetails';
+import { Navigation } from './Navigation';
 
 const App: FC = () => {
 
   return (
     <Router>
       <Authentication>
+        <Navigation />
         <Switch>
           <Route path="/" exact={true}>
             <Generate />
