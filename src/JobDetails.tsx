@@ -119,6 +119,8 @@ export const JobDetails: FC = () => {
                 <br />
                 Count: {job.count}
                 <br/>
+                Results: {results.length}
+                <br/>
                 {parent && <div style={{margin: "10px", border: "1px solid black", padding: "5px"}}>
                         Parent: <img style={{width: "256px", cursor: "pointer"}} src={`data:image/jpeg;base64,${parent.encoded_thumbnail}`}></img>
                     </div>}
