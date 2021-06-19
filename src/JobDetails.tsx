@@ -97,6 +97,11 @@ export const JobDetails: FC = () => {
         }
     }
 
+    async function onCancel() {
+        await client.cancelJob(params.job)
+        alert("Job cancelled")
+    }
+
     useEffect(() => {
         if (!job || job.id !== params.job) {
             init()
@@ -121,11 +126,12 @@ export const JobDetails: FC = () => {
                 <br/>
                 Results: {results.length}
                 <br/>
+                <button onClick={() => onCancel()}>Cancel</button>
+                <br/>
                 {parent && <div style={{margin: "10px", border: "1px solid black", padding: "5px"}}>
                         Parent: <img style={{width: "256px", cursor: "pointer"}} src={`data:image/jpeg;base64,${parent.encoded_thumbnail}`}></img>
                     </div>}
-                <button onClick={() => refresh()}>Refresh all</button>
-                <button onClick={() => fetchLatest()}>Fetch latest</button>
+
                 <hr/>
                 {results.map(result => (
                     <div key={result.id} style={{margin: "10px", float: "left", border: "1px solid black", padding: "5px"}}>
