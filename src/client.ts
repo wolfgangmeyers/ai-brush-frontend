@@ -7,7 +7,8 @@ export function getClient(): AIBrushApi {
     if (!client) {
         const httpClient = axios.default
         httpClient.defaults.headers.common["apikey"] = localStorage.getItem("apikey")
-        client = new AIBrushApi(undefined, "https://qb1eyw689j.execute-api.us-east-1.amazonaws.com/Prod", httpClient)
+        const backend = localStorage.getItem("backend") || "https://qb1eyw689j.execute-api.us-east-1.amazonaws.com/Prod"
+        client = new AIBrushApi(undefined, backend, httpClient)
     }
     return client
 }
