@@ -2,7 +2,7 @@ import React, { FC, useState, useEffect } from "react"
 import { useHistory } from "react-router-dom"
 import { Image } from "./generated-client/api"
 import { getClient } from "./client"
-import lscache from "lscache"
+import * as mcache from "./mcache"
 import moment from "moment"
 
 export const Images: FC = () => {
@@ -20,7 +20,7 @@ export const Images: FC = () => {
             let uncachedImages: Array<Image> = []
             let cachedImages: Array<Image> = []
             imageIdsResp.data.images.forEach(img => {
-                const cachedImage = lscache.get("images/" + img.id + "_thumbnail")
+                const cachedImage: Image | null = mcache.get("images/" + img.id + "_thumbnail")
                 if (cachedImage) {
                     cachedImages.push(cachedImage)
                 } else {
@@ -31,7 +31,7 @@ export const Images: FC = () => {
                 uncachedImages.map(img => client.getImage(img.id as string, "thumbnail"))
             )
             for (let img of imageResp) {
-                lscache.set("images/" + img.data.id + "_thumbnail", img.data)
+                mcache.set("images/" + img.data.id + "_thumbnail", img.data)
             }
             let images = [
                 ...imageResp.map(r => r.data as Image),

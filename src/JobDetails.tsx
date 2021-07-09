@@ -3,7 +3,8 @@ import { useHistory } from "react-router-dom"
 import { useParams } from "react-router-dom"
 import { Job, JobResult, Image } from "./generated-client/api"
 import { getClient } from "./client"
-import lscache from "lscache"
+import * as mcache from "./mcache"
+
 
 export const JobDetails: FC = () => {
 
@@ -17,20 +18,20 @@ export const JobDetails: FC = () => {
 
     async function loadParent(parentId: string) {
         console.log("loadParent")
-        const cachedParent = lscache.get("results/" + parentId + "_thumbnail")
+        const cachedParent = mcache.get("results/" + parentId + "_thumbnail") as Image | null
         if (cachedParent) {
             console.log("cached", cachedParent)
             setParent(cachedParent)
         } else {
             console.log("Loading parent")
             const parentResp = await client.getImage(parentId, "thumbnail")
-            lscache.set("results/" + parentId + "_thumbnail", parentResp.data)
+            mcache.set("results/" + parentId + "_thumbnail", parentResp.data)
             setParent(parentResp.data)
         }
     }
 
     async function init() {
-        let cached = lscache.get("results/" + params.job)
+        let cached = mcache.get("results/" + params.job)
         if (cached) {
             const job = cached as Job
             setJob(job)
@@ -41,7 +42,7 @@ export const JobDetails: FC = () => {
             return
         }
         const resp = await client.getJob(params.job)
-        lscache.set("results/" + params.job as string, resp.data)
+        mcache.set("results/" + params.job as string, resp.data)
         setJob(resp.data)
         if (resp.data.parent) {
             await loadParent(resp.data.parent)
@@ -55,7 +56,7 @@ export const JobDetails: FC = () => {
             const uncachedResults: Array<JobResult> = []
             const cachedResults: Array<JobResult> = []
             resultIdsResp.data.results.forEach(item => {
-                let cachedResult = lscache.get("results/" + item.id + "_thumbnail")
+                let cachedResult: JobResult | null = mcache.get("results/" + item.id + "_thumbnail")
                 if (cachedResult) {
                     cachedResults.push(cachedResult)
                 } else {
@@ -68,7 +69,7 @@ export const JobDetails: FC = () => {
                 )
             )
             for (let item of resultsResp) {
-                lscache.set("results/" + item.data.id + "_thumbnail", item.data)
+                mcache.set("results/" + item.data.id + "_thumbnail", item.data)
             }
             const results = [
                 ...resultsResp.map(resp => resp.data as JobResult),
@@ -91,7 +92,7 @@ export const JobDetails: FC = () => {
         if (resultIdsResp.data.results) {
             const resultsResp = await Promise.all(resultIdsResp.data.results.map(item => client.getJobResult(item.id as string)))
             for (let item of resultsResp) {
-                lscache.set("results/" + item.data.id + "_thumbnail", item.data)
+                mcache.set("results/" + item.data.id + "_thumbnail", item.data)
             }
             setResults(results => [...resultsResp.map(resp => resp.data as JobResult), ...results])
         }

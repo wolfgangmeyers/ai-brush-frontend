@@ -1,9 +1,10 @@
 import React, { FC, useEffect, useState } from "react"
 import { useHistory } from "react-router-dom"
 import qs from "qs"
-import lscache, { set } from "lscache"
 
 import { getClient } from "./client"
+import * as mcache from "./mcache"
+import { Image } from "./generated-client"
 
 export const Generate: FC = () => {
 
@@ -43,9 +44,9 @@ export const Generate: FC = () => {
   async function updateParent(parentId: string) {
     setParent(parentId)
     // try to load from cache
-    const cachedParent = lscache.get("results/" + parentId)
+    const cachedParent: Image | null = mcache.get("results/" + parentId)
     if (cachedParent) {
-      setPhrases(cachedParent.phrases)
+      setPhrases(cachedParent.phrases as Array<string>)
       return
     }
     const parentResp = await client.getImage(parentId)

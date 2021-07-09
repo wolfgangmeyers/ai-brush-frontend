@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react"
-import lscache from "lscache"
+import * as mcache from "./mcache"
 import { useHistory } from "react-router-dom"
 import { useParams } from "react-router-dom"
 import { getClient } from "./client"
@@ -13,13 +13,13 @@ export const ImageDetails: FC = () => {
     const [image, setImage] = useState<Image | undefined>(undefined)
 
     async function init() {
-        const cachedImage = lscache.get("/images/" + params.image + "_image")
+        const cachedImage: Image | null = mcache.get("/images/" + params.image + "_image")
         if (cachedImage) {
             setImage(cachedImage)
             return
         }
         const resp = await client.getImage(params.image, "image")
-        lscache.set("images/" + params.image + "_image", resp.data)
+        mcache.set("images/" + params.image + "_image", resp.data)
         setImage(resp.data)
     }
 

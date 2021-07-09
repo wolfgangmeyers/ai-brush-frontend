@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react"
-import lscache from "lscache"
+import * as mcache from "./mcache"
 import { useHistory } from "react-router-dom"
 import { useParams } from "react-router-dom"
 import { getClient } from "./client"
@@ -13,13 +13,13 @@ export const JobResultDetails: FC = () => {
     const [jobResult, setJobResult] = useState<JobResult | undefined>(undefined)
 
     async function init() {
-        const cachedResult = lscache.get("results/" + params.result + "_image")
+        const cachedResult: JobResult | null = mcache.get("results/" + params.result + "_image")
         if (cachedResult) {
             setJobResult(cachedResult)
             return
         }
         const resp = await client.getJobResult(params.result, "image")
-        lscache.set("results/" + params.result + "_image", resp.data)
+        mcache.set("results/" + params.result + "_image", resp.data)
         setJobResult(resp.data)
     }
 
