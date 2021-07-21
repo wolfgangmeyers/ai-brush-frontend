@@ -17,6 +17,7 @@ export const Generate: FC = () => {
   const [label, setLabel] = useState("")
   const [parent, setParent] = useState<string | undefined>(undefined)
   const [lr, setLr] = useState(0.06)
+  const [target, setTarget] = useState<string | undefined>(undefined)
 
   const searchParams = qs.parse(window.location.search.substring(1)) as any
 
@@ -38,6 +39,12 @@ export const Generate: FC = () => {
     const job = await client.createJob({
       count, iterations, phrases, label, parent
     })
+    // if target is populated, set job target
+    if (target) {
+      // split target into _, base64
+      const [_, base64] = target.split(",")
+      await client.setJobTarget(job.data.id as string, { image: base64 })
+    }
     history.push(`/jobs/${job.data.id}`)
   }
 
@@ -51,6 +58,22 @@ export const Generate: FC = () => {
     }
     const parentResp = await client.getImage(parentId)
     setPhrases(parentResp.data.phrases as Array<string>)
+  }
+
+  // load target from file using the FileReader api
+  function loadTarget(f: File | null) {
+    // if f is null return
+    if (!f) {
+      return
+    }
+    // read as base64
+    const reader = new FileReader()
+    reader.onload = e => {
+      const dataUrl = e?.target?.result as string
+      setTarget(dataUrl)
+    }
+    reader.readAsDataURL(f)
+
   }
 
   useEffect(() => {
@@ -83,8 +106,14 @@ export const Generate: FC = () => {
       <br /><br />
       <input min={0.01} max={0.2} step={0.01} style={{ width: "50px" }} type="number" value={lr} onChange={e => setLr(parseFloat(e.target.value))} />
       <br /><br />
+      <label>Target:</label>&nbsp;
+      <input type="file" onChange={e => loadTarget(e.target.files && e.target.files[0])} />
+      <br /><br />
+      {/* If target is populated, display an image with "target" as a data url */}
+      {target && <img src={target} />}
+      <br /><br />
       <label>Parent:</label>&nbsp;{parent || ""}
-      <br/><br/>
+      <br /><br />
       <button onClick={() => onGenerate()}>Generate &gt;&gt;</button>
     </div>
   )

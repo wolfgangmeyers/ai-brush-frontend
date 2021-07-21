@@ -11,6 +11,7 @@ export const JobDetails: FC = () => {
     const [job, setJob] = useState<Job | undefined>(undefined)
     const [results, setResults] = useState<Array<JobResult>>([])
     const [parent, setParent] = useState<Image | undefined>(undefined)
+    const [target, setTarget] = useState<string | undefined>(undefined)
 
     const params = useParams() as any
     const client = getClient()
@@ -30,6 +31,13 @@ export const JobDetails: FC = () => {
         }
     }
 
+    // load job target
+    async function loadTarget(job: Job) {
+        console.log("Loading target")
+        const targetResp = await client.getJobTarget(job.id as string)
+        setTarget(targetResp.data?.image)
+    }
+
     async function init() {
         let cached = mcache.get("results/" + params.job)
         if (cached) {
@@ -38,6 +46,7 @@ export const JobDetails: FC = () => {
             if (job.parent) {
                 await loadParent(job.parent)
             }
+            await loadTarget(job)
             await refresh()
             return
         }
@@ -47,6 +56,7 @@ export const JobDetails: FC = () => {
         if (resp.data.parent) {
             await loadParent(resp.data.parent)
         }
+        await loadTarget(resp.data)
         await refresh()
     }
 
@@ -133,6 +143,10 @@ export const JobDetails: FC = () => {
                         Parent: <img style={{width: "256px", cursor: "pointer"}} src={`data:image/jpeg;base64,${parent.encoded_thumbnail}`}></img>
                     </div>}
 
+                <br /><br />
+                {target && <div style={{margin: "10px", border: "1px solid black", padding: "5px"}}>
+                        Target: <img style={{width: "256px", cursor: "pointer"}} src={`data:image/jpeg;base64,${target}`}></img>
+                </div>}
                 <hr/>
                 {results.map(result => (
                     <div key={result.id} style={{margin: "10px", float: "left", border: "1px solid black", padding: "5px"}}>

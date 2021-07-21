@@ -25,7 +25,7 @@
         "build": "react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
-        "genclient": "openapi-generator-cli generate -g typescript-axios -i https://qb1eyw689j.execute-api.us-east-1.amazonaws.com/Prod/openapi.yaml -o src/generated-client"
+        "genclient": "openapi-generator-cli generate -g typescript-axios -i https://aibrush.ngrok.io/openapi.yaml -o src/generated-client"
     },
     "eslintConfig": {
         "extends": [
