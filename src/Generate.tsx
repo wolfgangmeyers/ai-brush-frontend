@@ -18,6 +18,7 @@ export const Generate: FC = () => {
   const [parent, setParent] = useState<string | undefined>(undefined)
   const [lr, setLr] = useState(0.06)
   const [target, setTarget] = useState<string | undefined>(undefined)
+  const [resetOptimizer, setResetOptimizer] = useState(true)
 
   const searchParams = qs.parse(window.location.search.substring(1)) as any
 
@@ -35,9 +36,10 @@ export const Generate: FC = () => {
 
   async function onGenerate() {
     console.log("phrases", phrases)
-    // TODO: include parent, if one has been selected
+    // filter phrases by empty
+    let filteredPhrases = phrases.filter(phrase => phrase.length > 0)
     const job = await client.createJob({
-      count, iterations, phrases, label, parent
+      count, iterations, phrases: filteredPhrases, label, parent
     })
     // if target is populated, set job target
     if (target) {
@@ -64,6 +66,11 @@ export const Generate: FC = () => {
   function loadTarget(f: File | null) {
     // if f is null return
     if (!f) {
+      return
+    }
+    // ensure file is a jpeg image
+    if (f.type !== "image/jpeg") {
+      alert("Please select a jpeg image.")
       return
     }
     // read as base64
@@ -105,6 +112,10 @@ export const Generate: FC = () => {
       <input min={1} max={100} style={{ width: "50px" }} type="number" value={count} onChange={e => setCount(parseInt(e.target.value))} />
       <br /><br />
       <input min={0.01} max={0.2} step={0.01} style={{ width: "50px" }} type="number" value={lr} onChange={e => setLr(parseFloat(e.target.value))} />
+      <br /><br />
+      {/* reset optimizer checkbox */}
+      <label>Reset Optimizer:</label>&nbsp;
+      <input type="checkbox" checked={resetOptimizer} onChange={e => setResetOptimizer(e.target.checked)} />
       <br /><br />
       <label>Target:</label>&nbsp;
       <input type="file" onChange={e => loadTarget(e.target.files && e.target.files[0])} />
