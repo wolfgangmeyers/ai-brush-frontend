@@ -50,6 +50,16 @@ export const ImageDetails: FC = () => {
             {/*
             <button onClick={() => onSave()}>Save</button>
             <button onClick={() => onSaveAndFork()}>Save and fork</button> */}
+            <br/>
+            <label>Phrases:</label>
+                {image?.phrases && image.phrases.map((p, i) => (
+                    <span style={{marginRight: "5px", borderRadius: "5px", backgroundColor: "#ddd"}} key={`phrase${i}`}>{p}</span>
+                ))}
+            <br/>
+            <label>Inverse Phrases:</label>
+                {image?.inverse_phrases && image.inverse_phrases.map((p, i) => (
+                    <span style={{marginRight: "5px", borderRadius: "5px", backgroundColor: "#ddd"}} key={`phrase${i}`}>{p}</span>
+                ))}
             <hr/>
             {image && (
                 <img style={{width: "512px"}} src={`data:image/jpeg;base64,${image.encoded_image}`}></img>

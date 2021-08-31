@@ -131,6 +131,8 @@ export const JobDetails: FC = () => {
                 <br />
                 Phrases: {job.phrases && job.phrases.join(", ")}
                 <br/>
+                Inverse Phrases: {job.inverse_phrases && job.inverse_phrases.join(", ")}
+                <br/>
                 Iterations: {job.iterations}
                 <br />
                 Count: {job.count}

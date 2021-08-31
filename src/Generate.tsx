@@ -12,6 +12,7 @@ export const Generate: FC = () => {
 
   const history = useHistory()
   const [phrases, setPhrases] = useState<Array<string>>([""])
+  const [inversePhrases, setInversePhrases] = useState<Array<string>>([""])
   const [iterations, setIterations] = useState(100)
   const [count, setCount] = useState(1)
   const [label, setLabel] = useState("")
@@ -34,12 +35,26 @@ export const Generate: FC = () => {
     setPhrases([...phrases, ""])
   }
 
+  function updateInversePhrase(phrase: string, index: number) {
+    setInversePhrases([...inversePhrases.slice(0, index), phrase, ...inversePhrases.slice(index + 1)])
+  }
+
+  function deleteInversePhrase(index: number) {
+    setInversePhrases([...inversePhrases.slice(0, index), ...inversePhrases.slice(index + 1)])
+  }
+
+  function addInversePhrase() {
+    setInversePhrases([...inversePhrases, ""])
+  }
+
+
   async function onGenerate() {
     console.log("phrases", phrases)
     // filter phrases by empty
     let filteredPhrases = phrases.filter(phrase => phrase.length > 0)
+    let filteredInversePhrases = inversePhrases.filter(phrase => phrase.length > 0)
     const job = await client.createJob({
-      count, iterations, phrases: filteredPhrases, label, parent
+      count, iterations, phrases: filteredPhrases, inverse_phrases: filteredInversePhrases, label, parent
     })
     // if target is populated, set job target
     if (target) {
@@ -56,10 +71,12 @@ export const Generate: FC = () => {
     const cachedParent: Image | null = mcache.get("results/" + parentId)
     if (cachedParent) {
       setPhrases(cachedParent.phrases as Array<string>)
+      setInversePhrases(cachedParent.inverse_phrases as Array<string>)
       return
     }
     const parentResp = await client.getImage(parentId)
     setPhrases(parentResp.data.phrases as Array<string>)
+    setInversePhrases(parentResp.data.inverse_phrases as Array<string>)
   }
 
   // load target from file using the FileReader api
@@ -104,6 +121,15 @@ export const Generate: FC = () => {
         </div>
       ))}
       <button type="button" onClick={() => addPhrase()}>+ Add</button>
+      <br /><br />
+      <label>Inverse Phrases:</label><br/>
+      {inversePhrases.map((phrase, i) => (
+        <div style={{ marginBottom: "5px" }}>
+          <input style={{ marginRight: "5px" }} type="text" key={`inverse_phrase_${i}`} value={phrase} onChange={e => updateInversePhrase(e.target.value, i)} />
+          <button onClick={() => deleteInversePhrase(i)} disabled={inversePhrases.length === 1}>X</button>
+        </div>
+      ))}
+      <button type="button" onClick={() => addInversePhrase()}>+ Add</button>
       <br /><br />
       <label>Iterations:</label>&nbsp;
       <input min={10} max={5000} style={{ width: "50px" }} type="number" value={iterations} onChange={e => setIterations(parseInt(e.target.value))} />
